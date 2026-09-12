@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case Study: From 12 to 100 Lighthouse</title>
+<meta name="description" content="How I took a broken page from a Lighthouse score of 12 to a perfect 100.">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#fafaf9;
+    --text:#1c1917;
+    --muted:#78716c;
+    --line:#e7e5e4;
+    --accent:#1e40af;
+    --red:#dc2626;
+    --green:#16a34a;
+  }
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65;
+    color:var(--text);
+    background:var(--bg);
+    font-size:17px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:48px 24px}
+
+  .back{
+    display:inline-block;
+    color:var(--muted);
+    text-decoration:none;
+    font-size:14.5px;
+    margin-bottom:32px;
+  }
+  .back:hover{color:var(--accent)}
+
+  h1{
+    font-size:clamp(28px,6vw,40px);
+    font-weight:700;
+    letter-spacing:-1px;
+    line-height:1.15;
+    margin-bottom:14px;
+  }
+  .lead{color:var(--muted);font-size:17.5px;margin-bottom:40px;max-width:540px}
+
+  h2{
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:1.6px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-top:56px;
+    margin-bottom:18px;
+  }
+
+  p{margin-bottom:16px;color:#292524}
+  p:last-child{margin-bottom:0}
+
+  ul{margin:0 0 16px 20px;color:#292524}
+  li{margin-bottom:8px;padding-left:4px}
+  li::marker{color:var(--muted)}
+
+  /* Score panels */
+  .panel{
+    border-radius:16px;
+    padding:28px 24px;
+    margin:20px 0;
+    border:1px solid var(--line);
+    background:#fff;
+  }
+  .panel.bad{border-color:#fecaca;background:#fef2f2}
+  .panel.good{border-color:#bbf7d0;background:#f0fdf4}
+
+  .panel-label{
+    font-size:12px;
+    letter-spacing:1.6px;
+    text-transform:uppercase;
+    font-weight:700;
+    margin-bottom:16px;
+  }
+  .panel.bad .panel-label{color:var(--red)}
+  .panel.good .panel-label{color:var(--green)}
+
+  .scores{display:flex;gap:10px;flex-wrap:wrap}
+  .score{
+    flex:1;
+    min-width:70px;
+    text-align:center;
+  }
+  .score-num{
+    font-size:36px;
+    font-weight:800;
+    letter-spacing:-1.5px;
+    line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .panel.bad .score-num{color:var(--red)}
+  .panel.good .score-num{color:var(--green)}
+  .score-name{
+    font-size:10.5px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-top:8px;
+    font-weight:600;
+  }
+
+  .divider{
+    text-align:center;
+    color:var(--muted);
+    font-size:24px;
+    margin:8px 0;
+  }
+
+  .fixes{list-style:none;margin-left:0}
+  .fixes li{
+    padding-left:26px;
+    position:relative;
+    margin-bottom:10px;
+  }
+  .fixes li::before{
+    content:"→";
+    position:absolute;
+    left:0;
+    color:var(--accent);
+    font-weight:700;
+  }
+
+  blockquote{
+    border-left:3px solid var(--accent);
+    padding-left:18px;
+    margin:24px 0;
+    font-style:italic;
+    color:#44403c;
+  }
+
+  footer{
+    color:var(--muted);
+    font-size:13px;
+    padding-top:32px;
+    margin-top:64px;
+    border-top:1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="index.html" class="back">← Back</a>
+
+  <h1>From 12 to 100 on Lighthouse</h1>
+  <p class="lead">A performance and accessibility case study — taking a deliberately broken page and rebuilding it to score perfectly on every metric.</p>
+
+  <h2>The Setup</h2>
+  <p>To understand how much performance actually matters, I built two versions of the same simple page:</p>
+  <ul>
+    <li><strong>Before:</strong> a page that breaks every rule — blocking scripts, no meta tags, huge DOM, low-contrast text.</li>
+    <li><strong>After:</strong> the same page rebuilt properly — clean HTML, inline CSS, semantic structure, accessible colors.</li>
+  </ul>
+  <p>Then I measured both with Google PageSpeed Insights.</p>
+
+  <h2>Before</h2>
+  <div class="panel bad">
+    <div class="panel-label">Lighthouse scores</div>
+    <div class="scores">
+      <div class="score"><div class="score-num">12</div><div class="score-name">Perf</div></div>
+      <div class="score"><div class="score-num">41</div><div class="score-name">A11y</div></div>
+      <div class="score"><div class="score-num">58</div><div class="score-name">Best</div></div>
+      <div class="score"><div class="score-num">50</div><div class="score-name">SEO</div></div>
+    </div>
+  </div>
+  <p>What was wrong:</p>
+  <ul>
+    <li>Render-blocking scripts that froze the main thread for 2 seconds</li>
+    <li>5,000 unnecessary DOM elements</li>
+    <li>Low-contrast text and no alt attributes on images</li>
+    <li>Missing meta tags, charset, viewport, and title</li>
+    <li>Mixed content warnings from HTTP resources on HTTPS</li>
+    <li>Deprecated HTML like <code>&lt;marquee&gt;</code> and <code>&lt;font&gt;</code></li>
+  </ul>
+
+  <div class="divider">↓</div>
+
+  <h2>After</h2>
+  <div class="panel good">
+    <div class="panel-label">Lighthouse scores</div>
+    <div class="scores">
+      <div class="score"><div class="score-num">100</div><div class="score-name">Perf</div></div>
+      <div class="score"><div class="score-num">100</div><div class="score-name">A11y</div></div>
+      <div class="score"><div class="score-num">100</div><div class="score-name">Best</div></div>
+      <div class="score"><div class="score-num">100</div><div class="score-name">SEO</div></div>
+    </div>
+  </div>
+  <p>What I changed:</p>
+  <ul class="fixes">
+    <li>Removed all render-blocking scripts and inlined critical CSS</li>
+    <li>Simplified the DOM from 5,000 elements to under 200</li>
+    <li>Added semantic HTML, alt text, and WCAG AA color contrast</li>
+    <li>Wrote complete meta tags — title, description, viewport, charset</li>
+    <li>Served everything over HTTPS with no mixed content</li>
+    <li>Used modern, standards-based HTML only</li>
+  </ul>
+
+  <h2>What I Learned</h2>
+  <blockquote>Performance isn't a checklist you run at the end. It's a series of small decisions you make while building — and each one has a cost.</blockquote>
+  <p>The biggest surprise wasn't how slow the "before" page was — it was how easy the "after" page was to build once I knew the rules. Every fix was obvious in hindsight. The skill is in knowing them <em>before</em> you start.</p>
+
+  <h2>The Two Pages</h2>
+  <p>You can try both yourself and see the difference in feel:</p>
+  <ul>
+    <li><a href="#">The "before" page</a> (intentionally broken)</li>
+    <li><a href="#">The "after" page</a> (optimized)</li>
+  </ul>
+
+  <footer>
+    © 2026 Your Name · <a href="index.html" style="color:inherit">Back to portfolio</a>
+  </footer>
+
+</div>
+</body>
+</html>
